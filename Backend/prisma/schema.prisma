@@ -10,9 +10,10 @@ datasource db {
 model User {
   id        Int      @id @default(autoincrement())
   name      String
+  email     String   @unique   // 🔥 TAMBAH INI
   nik       String?
-  contact   String   @unique
-  password  String   // 🔥 tambahkan ini
+  contact   String?            // 🔥 jadi optional
+  password  String
   role      Role     @default(USER)
   createdAt DateTime @default(now())
 

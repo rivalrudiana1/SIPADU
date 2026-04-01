@@ -11,6 +11,13 @@ export const login = async (data) => {
   return res.data;
 };
 
+// register (Tambahan Baru)
+export const register = async (data) => {
+  // data berisi object seperti { name, email, password }
+  const res = await api.post("/auth/register", data);
+  return res.data;
+};
+
 // logout
 export const logout = () => {
   localStorage.removeItem("token");
@@ -19,6 +26,6 @@ export const logout = () => {
 
 // get current user
 export const getMe = async () => {
-  const res = await api.get("/auth/me"); // atau /auth/me kalau kamu buat di backend
+  const res = await api.get("/auth/me"); 
   return res.data;
 };

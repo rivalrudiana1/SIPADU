@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "../shared/styles/LandingPage.css";
+// Pastikan path image ini sesuai dengan tempat kamu menyimpan gambarnya
+import logoDiciptabintar from "../assets/logo.png";
 
 // ── ICONS (inline SVG) ────────────────────────────────────────────────────────
 const SearchIcon = () => (
@@ -22,25 +24,17 @@ const ArrowIcon = () => (
 );
 
 // ── HEADER ────────────────────────────────────────────────────────────────────
+// Sekarang menggunakan satu gambar logo utama
 const Header = ({ onSearchClick }) => (
     <header className="header">
-        <div className="logo-area">
-            <div className="logo-emblem">
-                <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-                    <circle cx="14" cy="14" r="11" stroke="rgba(255,255,255,.5)" strokeWidth="1.2" fill="none" />
-                    <path d="M7 19 Q14 7 21 19" stroke="white" strokeWidth="1.8" fill="none" />
-                    <circle cx="14" cy="11" r="3" fill="rgba(255,255,255,.85)" />
-                </svg>
-            </div>
-
-            <div className="logo-text-group">
-                <span className="logo-title">DICIPTABINTAR</span>
-                <span className="logo-sub-text">
-                    Dinas Cipta Karya, Bina Konstruksi<br />dan Tata Ruang Kota Bandung
-                </span>
-            </div>
-
-            <div className="logo-badge">db</div>
+        <div className="logo-area-new">
+            <a href="/" className="logo-link">
+                <img 
+                    src={logoDiciptabintar} 
+                    alt="Logo DICIPTABINTAR Kota Bandung" 
+                    className="main-logo-img" 
+                />
+            </a>
         </div>
 
         <button className="search-btn" onClick={onSearchClick}>
@@ -57,9 +51,12 @@ const Navbar = ({ active, setActive }) => {
             {links.map((link) => (
                 <a
                     key={link}
-                    href="#"
+                    href={`#${link.toLowerCase()}`}
                     className={`nav-link${active === link ? " active" : ""}`}
-                    onClick={(e) => { e.preventDefault(); setActive(link); }}
+                    onClick={(e) => {
+                        e.preventDefault();
+                        setActive(link);
+                    }}
                 >
                     {link}
                 </a>
@@ -128,14 +125,36 @@ const StatsRibbon = () => (
 // ── MAIN PAGE ─────────────────────────────────────────────────────────────────
 export default function LandingPage() {
     const [activeNav, setActiveNav] = useState("Beranda");
+    const [isScrolled, setIsScrolled] = useState(false);
+
+    // Menangani efek scroll untuk header/navbar jika diperlukan di CSS
+    useEffect(() => {
+        const handleScroll = () => {
+            setIsScrolled(window.scrollY > 50);
+        };
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
 
     return (
-        <div>
+        <div className={`page-wrapper ${isScrolled ? "is-scrolled" : ""}`}>
             <Header onSearchClick={() => alert("Fitur pencarian akan segera hadir!")} />
             <Navbar active={activeNav} setActive={setActiveNav} />
-            <div className="header-spacer" />
-            <HeroSection />
-            <StatsRibbon />
+            
+            <main>
+                <div className="header-spacer" />
+                <HeroSection />
+                <StatsRibbon />
+                
+                {/* Kamu bisa menambahkan section lainnya di sini nanti */}
+                <section style={{ height: '50vh' }}>
+                    {/* Placeholder untuk konten tambahan */}
+                </section>
+            </main>
+
+            <footer style={{ padding: '40px', textAlign: 'center', background: '#fff', color: '#888', fontSize: '12px' }}>
+                &copy; 2026 DICIPTABINTAR Kota Bandung. All rights reserved.
+            </footer>
         </div>
     );
 }

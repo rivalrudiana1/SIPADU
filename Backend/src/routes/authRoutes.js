@@ -11,7 +11,10 @@ router.post("/register", async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    // cek user sudah ada
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: "Semua field wajib diisi" });
+    }
+
     const existingUser = await prisma.user.findUnique({
       where: { email },
     });
@@ -20,14 +23,8 @@ router.post("/register", async (req, res) => {
       return res.status(400).json({ message: "Email sudah terdaftar" });
     }
 
-    if (!email || !password || !name) {
-      return res.status(400).json({ message: "Semua field wajib diisi" });
-    }
-
-    // hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // simpan user
     const user = await prisma.user.create({
       data: {
         name,
@@ -45,6 +42,7 @@ router.post("/register", async (req, res) => {
       },
     });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: error.message });
   }
 });
@@ -54,7 +52,10 @@ router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // cari user
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email & password wajib" });
+    }
+
     const user = await prisma.user.findUnique({
       where: { email },
     });
@@ -63,14 +64,12 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ message: "User tidak ditemukan" });
     }
 
-    // cek password
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
       return res.status(400).json({ message: "Password salah" });
     }
 
-    // generate JWT
     const token = jwt.sign(
       {
         id: user.id,
@@ -85,6 +84,7 @@ router.post("/login", async (req, res) => {
       token,
     });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: error.message });
   }
 });
@@ -92,7 +92,7 @@ router.post("/login", async (req, res) => {
 // GET ME
 router.get("/me", authMiddleware, (req, res) => {
   res.json({
-    user: req.user
+    user: req.user,
   });
 });
 

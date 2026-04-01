@@ -65,6 +65,50 @@ body {
 }
 
 /* Logo area */
+/* ── LOGO AREA NEW (Updated untuk Satu Gambar) ─────────────────────────── */
+
+/* Ganti .logo-area yang lama dengan .logo-area-new */
+.logo-area-new {
+  display: flex;
+  align-items: center;
+  height: 100%; /* Agar sejajar vertikal dengan header */
+}
+
+.logo-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none; /* Hilangkan garis bawah jika ada */
+    height: 100%;
+}
+
+/* Styling utama untuk gambar logo */
+.main-logo-img {
+  /* Tentukan tinggi gambar agar pas di header 78px */
+    height: 52px; /* Sesuaikan angka ini agar logo terlihat ideal */
+    width: auto; /* Biarkan lebar menyesuaikan secara proporsional */
+
+  /* Tambahkan sedikit margin-left jika posisinya terlalu rapat ke kiri */
+  margin-left: -5px; /* Beri angka negatif kecil jika logo-area punya padding */
+
+    display: block;
+    object-fit: contain; /* Pastikan gambar tidak terpotong */
+
+  /* Pastikan transisi untuk hover lembut */
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+/* Beri efek sedikit saat hover agar user tahu ini bisa diklik */
+.logo-link:hover .main-logo-img {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+/* Jangan lupa untuk memperbarui CSS .header agar padding-nya sesuai */
+.header {
+  /* ... property lainnya sama ... */
+  padding: 0 30px; /* Sesuaikan padding agar logo punya ruang di kiri */
+}
+
 .logo-area {
     display: flex;
     align-items: center;
