@@ -4,7 +4,9 @@ import { api } from "./api";
 export const login = async (data) => {
   const res = await api.post("/auth/login", data);
 
-  localStorage.setItem("token", res.data.token);
+  if (res.data.token) {
+    localStorage.setItem("token", res.data.token);
+  }
 
   return res.data;
 };
@@ -12,10 +14,11 @@ export const login = async (data) => {
 // logout
 export const logout = () => {
   localStorage.removeItem("token");
+  window.location.href = "/login";
 };
 
 // get current user
 export const getMe = async () => {
-  const res = await api.get("/auth/me");
+  const res = await api.get("/auth/me"); // atau /auth/me kalau kamu buat di backend
   return res.data;
 };
