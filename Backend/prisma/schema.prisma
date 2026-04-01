@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  nik       String?
+  contact   String   @unique
+  password  String   // 🔥 tambahkan ini
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+
+  tickets        Ticket[]
+  responses      TicketResponse[]
+  assignments    Assignment[]
+}
+
+model Ticket {
+  id                Int      @id @default(autoincrement())
+  userId            Int
+  jenisId           Int
+  klasifikasiId     Int
+  title             String
+  description       String
+  status            Status   @default(OPEN)
+  createdAt         DateTime @default(now())
+
+  user              User @relation(fields: [userId], references: [id])
+  jenis             JenisPermohonan @relation(fields: [jenisId], references: [id])
+  klasifikasi       Klasifikasi @relation(fields: [klasifikasiId], references: [id])
+
+  responses         TicketResponse[]
+  assignments       Assignment[]
+}
+
+model TicketResponse {
+  id        Int      @id @default(autoincrement())
+  ticketId  Int
+  adminId   Int
+  message   String
+  createdAt DateTime @default(now())
+
+  ticket    Ticket @relation(fields: [ticketId], references: [id])
+  admin     User   @relation(fields: [adminId], references: [id])
+}
+
+model Assignment {
+  id        Int      @id @default(autoincrement())
+  ticketId  Int
+  adminId   Int
+  assignedAt DateTime @default(now())
+
+  ticket    Ticket @relation(fields: [ticketId], references: [id])
+  admin     User   @relation(fields: [adminId], references: [id])
+}
+
+model JenisPermohonan {
+  id    Int    @id @default(autoincrement())
+  name  String
+
+  tickets Ticket[]
+}
+
+model Klasifikasi {
+  id       Int    @id @default(autoincrement())
+  kategori String
+  name     String
+
+  tickets Ticket[]
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Status {
+  OPEN
+  IN_PROGRESS
+  DONE
+}
