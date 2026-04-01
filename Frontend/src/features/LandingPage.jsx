@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import "../shared/styles/LandingPage.css";
-// Pastikan path image ini sesuai dengan tempat kamu menyimpan gambarnya
 import logoDiciptabintar from "../assets/logo.png";
+import RegisterModal from "./RegisterModal"; // Pastikan file RegisterModal.jsx ada di folder yang sama
 
 // ── ICONS (inline SVG) ────────────────────────────────────────────────────────
 const SearchIcon = () => (
@@ -24,7 +24,6 @@ const ArrowIcon = () => (
 );
 
 // ── HEADER ────────────────────────────────────────────────────────────────────
-// Sekarang menggunakan satu gambar logo utama
 const Header = ({ onSearchClick }) => (
     <header className="header">
         <div className="logo-area-new">
@@ -36,7 +35,6 @@ const Header = ({ onSearchClick }) => (
                 />
             </a>
         </div>
-
         <button className="search-btn" onClick={onSearchClick}>
             <SearchIcon />Cari Informasi...
         </button>
@@ -66,7 +64,8 @@ const Navbar = ({ active, setActive }) => {
 };
 
 // ── HERO ──────────────────────────────────────────────────────────────────────
-const HeroSection = () => (
+// Tambahkan prop onRegisterClick agar button bisa buka modal
+const HeroSection = ({ onRegisterClick }) => (
     <section className="hero">
         <div className="hero-bg" />
         <div className="hero-stripe-overlay" />
@@ -88,15 +87,14 @@ const HeroSection = () => (
             </p>
 
             <div className="hero-actions anim-fade-up-4">
-                <a href="#" className="btn btn-primary"><PlusIcon /> Registrasi</a>
+                {/* Button ini sekarang memicu state modal */}
+                <button onClick={onRegisterClick} className="btn btn-primary">
+                    <PlusIcon /> Registrasi
+                </button>
                 <a href="#" className="btn btn-outline"><ArrowIcon /> Masuk</a>
             </div>
         </div>
 
-        <div className="scroll-hint anim-fade-in">
-            <span>Gulir</span>
-            <div className="bounce-arrow" />
-        </div>
     </section>
 );
 
@@ -126,8 +124,8 @@ const StatsRibbon = () => (
 export default function LandingPage() {
     const [activeNav, setActiveNav] = useState("Beranda");
     const [isScrolled, setIsScrolled] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false); 
 
-    // Menangani efek scroll untuk header/navbar jika diperlukan di CSS
     useEffect(() => {
         const handleScroll = () => {
             setIsScrolled(window.scrollY > 50);
@@ -143,14 +141,22 @@ export default function LandingPage() {
             
             <main>
                 <div className="header-spacer" />
-                <HeroSection />
+                
+                {/* Oper fungsi setIsModalOpen ke dalam HeroSection */}
+                <HeroSection onRegisterClick={() => setIsModalOpen(true)} />
+                
                 <StatsRibbon />
                 
-                {/* Kamu bisa menambahkan section lainnya di sini nanti */}
                 <section style={{ height: '50vh' }}>
-                    {/* Placeholder untuk konten tambahan */}
+                    {/* Placeholder konten tambahan */}
                 </section>
             </main>
+
+            {/* Modal Registrasi */}
+            <RegisterModal 
+                isOpen={isModalOpen} 
+                onClose={() => setIsModalOpen(false)} 
+            />
 
             <footer style={{ padding: '40px', textAlign: 'center', background: '#fff', color: '#888', fontSize: '12px' }}>
                 &copy; 2026 DICIPTABINTAR Kota Bandung. All rights reserved.
