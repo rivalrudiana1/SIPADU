@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import "../shared/styles/LandingPage.css";
 import logoDiciptabintar from "../assets/logo.png";
 import RegisterModal from "./RegisterModal"; // Pastikan file RegisterModal.jsx ada di folder yang sama
+import LoginModal from "./LoginModal";
 
 // ── ICONS (inline SVG) ────────────────────────────────────────────────────────
 const SearchIcon = () => (
@@ -65,7 +66,7 @@ const Navbar = ({ active, setActive }) => {
 
 // ── HERO ──────────────────────────────────────────────────────────────────────
 // Tambahkan prop onRegisterClick agar button bisa buka modal
-const HeroSection = ({ onRegisterClick }) => (
+const HeroSection = ({ onRegisterClick, onLoginClick }) => (
     <section className="hero">
         <div className="hero-bg" />
         <div className="hero-stripe-overlay" />
@@ -91,7 +92,10 @@ const HeroSection = ({ onRegisterClick }) => (
                 <button onClick={onRegisterClick} className="btn btn-primary">
                     <PlusIcon /> Registrasi
                 </button>
-                <a href="#" className="btn btn-outline"><ArrowIcon /> Masuk</a>
+                {/* Ubah <a> jadi <button> atau kasih onClick */}
+            <button onClick={onLoginClick} className="btn btn-outline">
+                <ArrowIcon /> Masuk
+            </button>
             </div>
         </div>
 
@@ -125,6 +129,8 @@ export default function LandingPage() {
     const [activeNav, setActiveNav] = useState("Beranda");
     const [isScrolled, setIsScrolled] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false); 
+    const [isRegisterOpen, setIsRegisterOpen] = useState(false); 
+    const [isLoginOpen, setIsLoginOpen] = useState(false);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -143,8 +149,9 @@ export default function LandingPage() {
                 <div className="header-spacer" />
                 
                 {/* Oper fungsi setIsModalOpen ke dalam HeroSection */}
-                <HeroSection onRegisterClick={() => setIsModalOpen(true)} />
-                
+                <HeroSection 
+                onRegisterClick={() => setIsModalOpen(true)}
+                onLoginClick={() => setIsLoginOpen(true)}/>
                 <StatsRibbon />
                 
                 <section style={{ height: '50vh' }}>
@@ -158,6 +165,11 @@ export default function LandingPage() {
                 onClose={() => setIsModalOpen(false)} 
             />
 
+            {/* Modal Login */}
+            <LoginModal 
+                isOpen={isLoginOpen} 
+                onClose={() => setIsLoginOpen(false)} 
+            />
             <footer style={{ padding: '40px', textAlign: 'center', background: '#fff', color: '#888', fontSize: '12px' }}>
                 &copy; 2026 DICIPTABINTAR Kota Bandung. All rights reserved.
             </footer>
