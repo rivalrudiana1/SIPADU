@@ -1,178 +1,114 @@
-import { useState, useEffect } from "react";
-import "../shared/styles/LandingPage.css";
-import logoDiciptabintar from "../assets/logo.png";
-import RegisterModal from "./RegisterModal"; // Pastikan file RegisterModal.jsx ada di folder yang sama
+import React, { useState, useEffect } from "react";
+import { Button } from "@material-tailwind/react";
+
+// Import komponen-komponen global
+import Header from "../shared/components/Header";
+import Navbar from "../shared/components/Navbar";
+import Footer from "../shared/components/Footer";
+import RegisterModal from "./RegisterModal"; 
 import LoginModal from "./LoginModal";
 
-// ── ICONS (inline SVG) ────────────────────────────────────────────────────────
-const SearchIcon = () => (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-        <circle cx="6" cy="6" r="4.5" stroke="#888" strokeWidth="1.5" />
-        <line x1="9.5" y1="9.5" x2="13" y2="13" stroke="#888" strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
-);
-
+// ── ICONS ──────────────────────────────────────────────────────────────────────
 const PlusIcon = () => (
-    <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-        <path d="M6.5 1v11M1 6.5h11" stroke="white" strokeWidth="2" strokeLinecap="round" />
+    <svg width="14" height="14" viewBox="0 0 13 13" fill="none" className="mr-2">
+        <path d="M6.5 1v11M1 6.5h11" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
     </svg>
 );
 
 const ArrowIcon = () => (
-    <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-        <path d="M1.5 6.5h10M6.5 1.5l5 5-5 5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    <svg width="14" height="14" viewBox="0 0 13 13" fill="none" className="mr-2">
+        <path d="M1.5 6.5h10M6.5 1.5l5 5-5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
 );
 
-// ── HEADER ────────────────────────────────────────────────────────────────────
-const Header = ({ onSearchClick }) => (
-    <header className="header">
-        <div className="logo-area-new">
-            <a href="/" className="logo-link">
-                <img 
-                    src={logoDiciptabintar} 
-                    alt="Logo DICIPTABINTAR Kota Bandung" 
-                    className="main-logo-img" 
-                />
-            </a>
-        </div>
-        <button className="search-btn" onClick={onSearchClick}>
-            <SearchIcon />Cari Informasi...
-        </button>
-    </header>
-);
-
-// ── NAVBAR ────────────────────────────────────────────────────────────────────
-const Navbar = ({ active, setActive }) => {
-    const links = ["Beranda", "Layanan", "Informasi"];
-    return (
-        <nav className="navbar">
-            {links.map((link) => (
-                <a
-                    key={link}
-                    href={`#${link.toLowerCase()}`}
-                    className={`nav-link${active === link ? " active" : ""}`}
-                    onClick={(e) => {
-                        e.preventDefault();
-                        setActive(link);
-                    }}
-                >
-                    {link}
-                </a>
-            ))}
-        </nav>
-    );
-};
-
-// ── HERO ──────────────────────────────────────────────────────────────────────
-// Tambahkan prop onRegisterClick agar button bisa buka modal
+// ── HERO SECTION ──────────────────────────────────────────────────────────────
 const HeroSection = ({ onRegisterClick, onLoginClick }) => (
-    <section className="hero">
-        <div className="hero-bg" />
-        <div className="hero-stripe-overlay" />
+    <section className="relative w-full h-[calc(100vh-124px)] min-h-[560px] flex items-center overflow-hidden font-jakarta bg-[#1A1A1A]">
+        {/* Hero Background */}
+        <div 
+            className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
+            style={{ 
+                backgroundImage: `linear-gradient(to bottom, rgba(28, 35, 45, 0.58) 0%, rgba(28, 35, 45, 0.52) 55%, rgba(18, 24, 33, 0.74) 100%), url('/src/assets/Background.png')` 
+            }}
+        />
+        
+        {/* Stripe Overlay */}
+        <div className="absolute inset-0 z-[1] opacity-[0.04]" 
+             style={{ backgroundImage: 'repeating-linear-gradient(-55deg, transparent, transparent 58px, #B8A165 58px, #B8A165 59px)' }} 
+        />
 
-        <div className="hero-content">
-            <div className="hero-tag anim-fade-up-1">
+        <div className="relative z-10 px-8 md:px-20 max-w-[820px]">
+            <div className="inline-block bg-gold/20 border border-gold/50 text-gold-light text-[11px] font-bold tracking-[0.18em] uppercase px-[14px] py-[5px] rounded-[3px] mb-[22px] animate-fade-up [animation-delay:0.1s] opacity-0">
                 Kota Bandung · Jawa Barat
             </div>
 
-            <h1 className="hero-title anim-fade-up-2">
+            <h1 className="font-playfair text-[clamp(38px,5.4vw,70px)] font-black text-white leading-[1.08] mb-5 drop-shadow-lg animate-fade-up [animation-delay:0.28s] opacity-0">
                 Dinas Cipta Karya<br />
                 Bina Konstruksi dan<br />
-                <span>Tata Ruang</span><br />
+                <span className="text-gold-light">Tata Ruang</span><br />
                 Kota Bandung
             </h1>
 
-            <p className="hero-subtitle anim-fade-up-3">
-                Melayani dan Memberikan Informasi<br />Kepada Warga Kota Bandung.
+            <p className="text-white/80 text-[clamp(14px,1.45vw,17px)] font-light leading-[1.75] max-w-[460px] mb-10 animate-fade-up [animation-delay:0.46s] opacity-0">
+                Melayani dan Memberikan Informasi Kepada Warga Kota Bandung.
             </p>
 
-            <div className="hero-actions anim-fade-up-4">
-                {/* Button ini sekarang memicu state modal */}
-                <button onClick={onRegisterClick} className="btn btn-primary">
+            <div className="flex flex-wrap gap-[14px] animate-fade-up [animation-delay:0.62s] opacity-0">
+                <Button 
+                    onClick={onRegisterClick}
+                    className="bg-gold hover:bg-gold-light flex items-center px-8 py-[14px] rounded-[4px] shadow-lg shadow-gold/40 text-[13px] tracking-[0.1em] font-bold uppercase transition-all hover:-translate-y-0.5"
+                >
                     <PlusIcon /> Registrasi
-                </button>
-                {/* Ubah <a> jadi <button> atau kasih onClick */}
-            <button onClick={onLoginClick} className="btn btn-outline">
-                <ArrowIcon /> Masuk
-            </button>
+                </Button>
+                <Button 
+                    variant="outlined"
+                    onClick={onLoginClick}
+                    className="border-2 border-white/65 text-white hover:bg-white/10 flex items-center px-8 py-[14px] rounded-[4px] text-[13px] tracking-[0.1em] font-bold uppercase transition-all hover:-translate-y-0.5"
+                >
+                    <ArrowIcon /> Masuk
+                </Button>
             </div>
         </div>
-
     </section>
-);
-
-// ── STATS RIBBON ──────────────────────────────────────────────────────────────
-const STATS = [
-    { icon: "🏗️", label: "Proyek Aktif", value: "128+" },
-    { icon: "📋", label: "Layanan Tersedia", value: "24" },
-    { icon: "👤", label: "Pengguna Terdaftar", value: "12.5K" },
-    { icon: "📍", label: "Kecamatan", value: "30" },
-];
-
-const StatsRibbon = () => (
-    <div className="stats-ribbon">
-        {STATS.map((s) => (
-            <div key={s.label} className="stat-card">
-                <div className="stat-icon">{s.icon}</div>
-                <div>
-                    <div className="stat-label">{s.label}</div>
-                    <div className="stat-value">{s.value}</div>
-                </div>
-            </div>
-        ))}
-    </div>
 );
 
 // ── MAIN PAGE ─────────────────────────────────────────────────────────────────
 export default function LandingPage() {
-    const [activeNav, setActiveNav] = useState("Beranda");
-    const [isScrolled, setIsScrolled] = useState(false);
-    const [isModalOpen, setIsModalOpen] = useState(false); 
+    // State untuk kontrol modal
     const [isRegisterOpen, setIsRegisterOpen] = useState(false); 
     const [isLoginOpen, setIsLoginOpen] = useState(false);
 
-    useEffect(() => {
-        const handleScroll = () => {
-            setIsScrolled(window.scrollY > 50);
-        };
-        window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
-    }, []);
-
     return (
-        <div className={`page-wrapper ${isScrolled ? "is-scrolled" : ""}`}>
-            <Header onSearchClick={() => alert("Fitur pencarian akan segera hadir!")} />
-            <Navbar active={activeNav} setActive={setActiveNav} />
+        <div className="bg-offWhite min-h-screen flex flex-col relative font-jakarta">
             
-            <main>
-                <div className="header-spacer" />
-                
-                {/* Oper fungsi setIsModalOpen ke dalam HeroSection */}
-                <HeroSection 
-                onRegisterClick={() => setIsModalOpen(true)}
-                onLoginClick={() => setIsLoginOpen(true)}/>
-                <StatsRibbon />
-                
-                <section style={{ height: '50vh' }}>
-                    {/* Placeholder konten tambahan */}
-                </section>
+            {/* WRAPPER FIXED: Satukan Header & Navbar agar tidak renggang */}
+            <div className="fixed top-0 left-0 right-0 z-[50]">
+                {/* Pastikan di dalam Header.jsx & Navbar.jsx TIDAK ADA class 'fixed' lagi */}
+                <Header onSearchClick={() => alert("Pencarian aktif")} />
+                <Navbar />
+            </div>
+            
+            <main className="flex-grow">
+                {/* pt-[124px] adalah tinggi Header(78) + Navbar(46) */}
+                <div className="pt-[124px]">
+                    <HeroSection 
+                        onRegisterClick={() => setIsRegisterOpen(true)}
+                        onLoginClick={() => setIsLoginOpen(true)}
+                    />
+                </div>
             </main>
 
-            {/* Modal Registrasi */}
+            {/* MODAL SYSTEMS: Pastikan komponen Modal menerima props isOpen & onClose */}
             <RegisterModal 
-                isOpen={isModalOpen} 
-                onClose={() => setIsModalOpen(false)} 
+                isOpen={isRegisterOpen} 
+                onClose={() => setIsRegisterOpen(false)} 
             />
-
-            {/* Modal Login */}
             <LoginModal 
                 isOpen={isLoginOpen} 
                 onClose={() => setIsLoginOpen(false)} 
             />
-            <footer style={{ padding: '40px', textAlign: 'center', background: '#fff', color: '#888', fontSize: '12px' }}>
-                &copy; 2026 DICIPTABINTAR Kota Bandung. All rights reserved.
-            </footer>
+            
+            <Footer />
         </div>
     );
 }
