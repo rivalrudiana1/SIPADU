@@ -52,40 +52,29 @@ router.post("/register", async (req, res) => {
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
+    const user = await prisma.user.findUnique({ where: { email } });
 
-    if (!email || !password) {
-      return res.status(400).json({ message: "Email & password wajib" });
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { email },
-    });
-
-    if (!user) {
-      return res.status(400).json({ message: "User tidak ditemukan" });
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-
-    if (!isMatch) {
-      return res.status(400).json({ message: "Password salah" });
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      return res.status(400).json({ message: "Email atau password salah" });
     }
 
     const token = jwt.sign(
-      {
-        id: user.id,
-        role: user.role,
-      },
+      { id: user.id, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: "1d" },
     );
 
+    // --- PASTIKAN BAGIAN INI MENGIRIM USER ---
     res.json({
       message: "Login berhasil",
       token,
+      user: {
+        id: user.id,
+        name: user.name,
+        role: user.role, // Ini yang dibaca oleh Frontend
+      },
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: error.message });
   }
 });

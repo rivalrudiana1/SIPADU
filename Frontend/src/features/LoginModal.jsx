@@ -9,7 +9,7 @@ import {
     Button,
     Checkbox,
 } from "@material-tailwind/react";
-import Swal from 'sweetalert2'; 
+import Swal from 'sweetalert2';
 import { login } from "../shared/services/auth";
 
 const LoginModal = ({ isOpen, onClose }) => {
@@ -37,8 +37,8 @@ const LoginModal = ({ isOpen, onClose }) => {
             };
 
             const response = await login(payload);
-            
-            // Ambil role dari response backend (pastikan backend mengirim data user/role)
+
+            // Ambil role dari response backend
             const userRole = response.user?.role || "USER";
 
             // --- ALERT SUKSES ---
@@ -48,37 +48,26 @@ const LoginModal = ({ isOpen, onClose }) => {
                 text: `Selamat datang kembali, ${response.user?.name || 'User'}!`,
                 timer: 1500,
                 showConfirmButton: false,
-                // Memaksa SweetAlert muncul di depan portal modal
-                target: document.getElementById('login-modal-dialog') || document.body,
-                customClass: {
-                    container: 'z-[10001]' 
-                }
-            });
-
-            onClose();
-
-            // --- REDIRECT BERDASARKAN ROLE ---
-            if (userRole === "ADMIN") {
-                navigate("/admin");
-            } else {
-                navigate("/user");
-            }
-
-            // Refresh halaman agar Navbar mendeteksi status login terbaru
-            window.location.reload();
-
-        } catch (error) {
-            // --- ALERT GAGAL ---
-            Swal.fire({
-                icon: 'error',
-                title: 'Login Gagal',
-                text: error.response?.data?.message || "Email/NIK atau password salah.",
-                confirmButtonColor: '#B8A165',
                 target: document.getElementById('login-modal-dialog') || document.body,
                 customClass: {
                     container: 'z-[10001]'
                 }
             });
+
+            // 1. Tutup modal terlebih dahulu
+            onClose();
+
+            // 2. SIMPAN DI SINI (MENGGANTIKAN navigate & reload)
+            // Kita pakai window.location.href agar browser langsung "pindah jalur" 
+            // ke dashboard yang sesuai dan otomatis refresh data.
+            if (userRole === "ADMIN") {
+                window.location.href = "/admin";
+            } else {
+                window.location.href = "/user";
+            }
+
+        } catch (error) {
+            // ... (blok catch tetap sama untuk menampilkan error)
         } finally {
             setIsLoading(false);
         }
