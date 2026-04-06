@@ -10,71 +10,74 @@ datasource db {
 model User {
   id        Int      @id @default(autoincrement())
   name      String
-  email     String   @unique   // 🔥 TAMBAH INI
-  nik       String?
-  contact   String?            // 🔥 jadi optional
+  email     String   @unique
+  nik       String?  @unique
   password  String
+  contact   String?
+  alamat    String?  @db.Text
   role      Role     @default(USER)
   createdAt DateTime @default(now())
 
-  tickets        Ticket[]
-  responses      TicketResponse[]
-  assignments    Assignment[]
+  tickets     Ticket[]
+  responses   TicketResponse[]
+  assignments Assignment[]
 }
 
 model Ticket {
-  id                Int      @id @default(autoincrement())
-  userId            Int
-  jenisId           Int
-  klasifikasiId     Int
-  title             String
-  description       String
-  status            Status   @default(OPEN)
-  createdAt         DateTime @default(now())
+  id              Int      @id @default(autoincrement())
+  userId          Int
+  jenisId         Int
+  klasifikasiId   Int
+  title           String
+  description     String   @db.Text
+  attachment      String?
+  status          Status   @default(OPEN)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
-  user              User @relation(fields: [userId], references: [id])
-  jenis             JenisPermohonan @relation(fields: [jenisId], references: [id])
-  klasifikasi       Klasifikasi @relation(fields: [klasifikasiId], references: [id])
+  user        User             @relation(fields: [userId], references: [id])
+  jenis       JenisPermohonan  @relation(fields: [jenisId], references: [id])
+  klasifikasi Klasifikasi      @relation(fields: [klasifikasiId], references: [id])
 
-  responses         TicketResponse[]
-  assignments       Assignment[]
+  responses   TicketResponse[]
+  assignments Assignment[]
 }
 
 model TicketResponse {
   id        Int      @id @default(autoincrement())
   ticketId  Int
-  adminId   Int
-  message   String
+  senderId  Int
+  message   String   @db.Text
   createdAt DateTime @default(now())
 
   ticket    Ticket @relation(fields: [ticketId], references: [id])
-  admin     User   @relation(fields: [adminId], references: [id])
+  sender    User   @relation(fields: [senderId], references: [id])
 }
 
 model Assignment {
-  id        Int      @id @default(autoincrement())
-  ticketId  Int
-  adminId   Int
+  id         Int      @id @default(autoincrement())
+  ticketId   Int
+  adminId    Int
   assignedAt DateTime @default(now())
 
-  ticket    Ticket @relation(fields: [ticketId], references: [id])
-  admin     User   @relation(fields: [adminId], references: [id])
+  ticket     Ticket @relation(fields: [ticketId], references: [id])
+  admin      User   @relation(fields: [adminId], references: [id])
 }
 
 model JenisPermohonan {
-  id    Int    @id @default(autoincrement())
-  name  String
-
+  id      Int      @id @default(autoincrement())
+  name    String
   tickets Ticket[]
 }
 
 model Klasifikasi {
-  id       Int    @id @default(autoincrement())
+  id       Int      @id @default(autoincrement())
   kategori String
   name     String
-
-  tickets Ticket[]
+  tickets  Ticket[]
 }
+
+// --- ENUM DEFINITIONS (WAJIB ADA) ---
 
 enum Role {
   USER
@@ -85,4 +88,5 @@ enum Status {
   OPEN
   IN_PROGRESS
   DONE
+  REJECTED
 }

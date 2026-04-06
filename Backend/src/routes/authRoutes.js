@@ -6,22 +6,26 @@ import { authMiddleware } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
-// REGISTER
+// REGISTER (Update agar sesuai dengan Frontend kamu)
 router.post("/register", async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    // Tambahkan field yang dikirim dari Frontend
+    const { name, email, password, nik, umur, alamat } = req.body;
 
-    if (!name || !email || !password) {
-      return res.status(400).json({ message: "Semua field wajib diisi" });
+    if (!name || !email || !password || !nik) {
+      return res.status(400).json({
+        message: "Data wajib (Nama, Email, Password, NIK) harus diisi",
+      });
     }
 
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    });
-
-    if (existingUser) {
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+    if (existingUser)
       return res.status(400).json({ message: "Email sudah terdaftar" });
-    }
+
+    // Cek juga NIK agar unik jika perlu
+    const existingNIK = await prisma.user.findFirst({ where: { nik } });
+    if (existingNIK)
+      return res.status(400).json({ message: "NIK sudah terdaftar" });
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -30,19 +34,16 @@ router.post("/register", async (req, res) => {
         name,
         email,
         password: hashedPassword,
-        role: "USER",
+        nik, // Pastikan field ini ada di schema.prisma
+        role: "USER", // Default tetap USER
       },
     });
 
     res.json({
       message: "Register berhasil",
-      user: {
-        id: user.id,
-        email: user.email,
-      },
+      user: { id: user.id, email: user.email },
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: error.message });
   }
 });
@@ -89,11 +90,23 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// GET ME
-router.get("/me", authMiddleware, (req, res) => {
-  res.json({
-    user: req.user,
-  });
+router.get("/me", authMiddleware, async (req, res) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.id },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        nik: true,
+        // Jangan sertakan password di sini
+      },
+    });
+    res.json({ user });
+  } catch (error) {
+    res.status(500).json({ message: "Gagal mengambil data user" });
+  }
 });
 
 export default router;
