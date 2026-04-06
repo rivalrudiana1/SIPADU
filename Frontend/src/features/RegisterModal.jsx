@@ -8,6 +8,7 @@ import {
     Textarea,
     Button,
 } from "@material-tailwind/react";
+import Swal from 'sweetalert2'; // Import SweetAlert2
 import { register } from "../shared/services/auth";
 
 const RegisterModal = ({ isOpen, onClose }) => {
@@ -22,7 +23,6 @@ const RegisterModal = ({ isOpen, onClose }) => {
 
     const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
-    const [apiError, setApiError] = useState("");
 
     // --- LOGIKA VALIDASI ---
     const validate = (name, value) => {
@@ -50,13 +50,19 @@ const RegisterModal = ({ isOpen, onClose }) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
         validate(name, value);
-        setApiError("");
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
         if (Object.values(errors).some(err => err !== "") || formData.password !== formData.confirmPassword) {
-            return alert("Periksa kembali inputan Anda");
+            return Swal.fire({
+                icon: 'error',
+                title: 'Data Tidak Valid',
+                text: 'Silakan periksa kembali isian formulir Anda.',
+                target: document.getElementById('register-modal-dialog'),
+                customClass: { container: 'z-[10001]' }
+            });
         }
 
         setIsLoading(true);
@@ -66,20 +72,45 @@ const RegisterModal = ({ isOpen, onClose }) => {
                 email: formData.email,
                 password: formData.password,
                 nik: formData.nik,
+                // Tambahkan field lain jika backend sudah mendukung
             });
-            alert("Registrasi Berhasil!");
+
+            // --- ALERT SUKSES ---
+            await Swal.fire({
+                icon: 'success',
+                title: 'Registrasi Berhasil!',
+                text: 'Akun Anda telah dibuat. Silakan masuk untuk melanjutkan.',
+                confirmButtonColor: '#B8A165',
+                target: document.getElementById('register-modal-dialog'),
+                customClass: { container: 'z-[10001]' }
+            });
+
             onClose();
         } catch (error) {
-            setApiError(error.response?.data?.message || "Registrasi gagal");
+            // --- ALERT GAGAL ---
+            Swal.fire({
+                icon: 'error',
+                title: 'Registrasi Gagal',
+                text: error.response?.data?.message || "Terjadi kesalahan saat mendaftar.",
+                confirmButtonColor: '#B8A165',
+                target: document.getElementById('register-modal-dialog'),
+                customClass: { container: 'z-[10001]' }
+            });
         } finally {
             setIsLoading(false);
         }
     };
 
     return (
-        <Dialog size="md" open={isOpen} handler={onClose} className="bg-transparent shadow-none z-[9999]">
-            <Card className="mx-auto w-full max-w-[34rem] border-t-4 border-gold">
-                <CardBody className="flex flex-col gap-4 font-jakarta p-8 max-h-[90vh] overflow-y-auto">
+        <Dialog 
+            size="md" 
+            open={isOpen} 
+            handler={onClose} 
+            id="register-modal-dialog" // ID untuk target SweetAlert2
+            className="bg-transparent shadow-none z-[9999]"
+        >
+            <Card className="mx-auto w-full max-w-[34rem] border-t-4 border-gold font-jakarta">
+                <CardBody className="flex flex-col gap-4 p-8 max-h-[90vh] overflow-y-auto">
                     {/* Header */}
                     <div className="relative text-center mb-2">
                         <button onClick={onClose} className="absolute -top-2 -right-2 text-gray-400 hover:text-red-500 text-2xl">&times;</button>
@@ -92,14 +123,12 @@ const RegisterModal = ({ isOpen, onClose }) => {
                     </div>
 
                     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                        {apiError && <div className="bg-red-50 text-red-600 text-xs p-2 rounded text-center border border-red-100">{apiError}</div>}
-
                         {/* Row 1: Nama Lengkap */}
                         <div className="w-full">
                             <Input label="Nama Lengkap" name="nama" color="amber" onChange={handleChange} required />
                         </div>
 
-                        {/* Row 2: Email & NIK (Simetris 50:50) */}
+                        {/* Row 2: Email & NIK */}
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <Input label="Email" name="email" color="amber" error={!!errors.email} onChange={handleChange} required />
@@ -111,7 +140,7 @@ const RegisterModal = ({ isOpen, onClose }) => {
                             </div>
                         </div>
 
-                        {/* Row 3: Password & Konfirmasi (Simetris 50:50) */}
+                        {/* Row 3: Password & Konfirmasi */}
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <Input type="password" label="Password" name="password" color="amber" error={!!errors.password} onChange={handleChange} required />
@@ -123,11 +152,9 @@ const RegisterModal = ({ isOpen, onClose }) => {
                             </div>
                         </div>
 
-                        {/* Row 4: Umur & Alamat (Grid Khusus agar simetris) */}
-                        <div className="grid grid-cols-12 items-start">
-                            <div className="col-span-12">
-                                <Textarea label="Alamat Lengkap" name="alamat" color="amber" rows={1} onChange={handleChange} required />
-                            </div>
+                        {/* Row 4: Alamat */}
+                        <div className="w-full">
+                            <Textarea label="Alamat Lengkap" name="alamat" color="amber" rows={2} onChange={handleChange} required />
                         </div>
 
                         <Button 
