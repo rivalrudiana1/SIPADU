@@ -1,9 +1,15 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:5000/api";
+// 1. Ambil URL dari .env (Vite)
+// Jika .env tidak terbaca, dia akan fallback ke localhost:5000 sebagai cadangan
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+
+// 2. Tambahkan /api di belakang URL jika backend kamu menggunakan prefix /api
+// Contoh: https://...trycloudflare.com/api
+const baseURL = `${API_BASE_URL}/api`;
 
 export const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: baseURL,
   headers: {
     "Content-Type": "application/json",
   },
@@ -27,9 +33,11 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    // Tambahkan pengecekan agar tidak terjadi infinite loop saat logout
+    if (error.response?.status === 401 && !window.location.pathname.includes("/login")) {
       localStorage.removeItem("token");
-      window.location.href = "/login";
+      // Gunakan window.location.replace agar tidak bisa di-back
+      window.location.replace("/"); 
     }
 
     return Promise.reject(error);

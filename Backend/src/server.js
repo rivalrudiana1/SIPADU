@@ -8,20 +8,37 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors());
+// 1. Middleware Global (Urutan sangat penting!)
+app.use(cors({
+  origin: "*",
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true
+}));
+
+// 2. Pre-flight OPTIONS manual
+app.use((req, res, next) => {
+  if (req.method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    return res.sendStatus(200);
+  }
+  next();
+});
+
 app.use(express.json());
 
-app.use("/api/auth", authRoutes);
-
+// 3. Pindahkan Rute Utama ke ATAS agar mudah dicek
 app.get("/", (req, res) => {
+  console.log("Koneksi masuk ke rute utama!"); // Untuk debugging di terminal VS Code
   res.send("API Running...");
 });
 
-app.listen(5000, () => {
-  console.log("Server running on port 5000");
-}); 
+// 4. Routes API
+app.use("/api/auth", authRoutes);
 
-// hanya login user
+// 5. Rute Terproteksi (Pindahkan ke ATAS app.listen)
 app.get("/api/profile", authMiddleware, (req, res) => {
   res.json({
     message: "Data profile",
@@ -29,9 +46,14 @@ app.get("/api/profile", authMiddleware, (req, res) => {
   });
 });
 
-// hanya admin
 app.get("/api/admin", authMiddleware, adminOnly, (req, res) => {
   res.json({
     message: "Welcome Admin"
   });
+});
+
+// 6. Jalankan Server (Harus di paling bawah)
+const PORT = 8080;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
